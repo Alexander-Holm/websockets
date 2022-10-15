@@ -1,7 +1,7 @@
 {
     "scripts": {
         "dev": "tsc-watch --onSuccess \"node distribution/server.js\"",
-        "build": "tsc --build",
+        "build": "npm install && tsc --build",
         "start": "node distribution/server.js"
     },
     "dependencies": {
