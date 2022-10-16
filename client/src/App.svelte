@@ -6,6 +6,8 @@
 
     
     const SERVICE_URL = process.env.SERVICE_URL;
+    console.log(SERVICE_URL)
+    console.log(process.env)
     let isConnected = false;
     let websocket: WebSocket;
 
