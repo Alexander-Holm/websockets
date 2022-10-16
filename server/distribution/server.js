@@ -2,12 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
 const enums_1 = require("./enums");
-let port;
-if (process.env.PORT)
-    port = parseInt(process.env.PORT);
-if (port === NaN || process.env.PORT == null)
-    port = 5000;
-const server = new ws_1.WebSocketServer({ port });
+const server = new ws_1.WebSocketServer({ port: 5000 });
 console.log("Server started");
 class User {
     constructor(name, socket) {
