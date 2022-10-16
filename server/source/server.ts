@@ -1,7 +1,12 @@
 import { WebSocketServer, WebSocket } from "ws"
 import { Actions, MessageTypes } from "./enums"
 
-const server = new WebSocketServer( {port: 443} );
+let port;
+if(process.env.PORT)
+    port = parseInt(process.env.PORT);
+if(port === NaN || process.env.PORT == null)
+    port = 5000;    
+const server = new WebSocketServer( {port} );
 console.log("Server started");
 
 class User{
