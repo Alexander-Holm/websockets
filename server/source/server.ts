@@ -1,8 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws"
 import { Actions, MessageTypes } from "./enums"
 
-const server = new WebSocketServer( {port: 5050} );
-console.log("server started")
+const server = new WebSocketServer( {port: 443} );
+console.log("Server started");
 
 class User{
     name: string;
@@ -15,7 +15,7 @@ class User{
 const connectedUsers: User[] = [];
 
 server.on("connection", socket => {
-    console.log("client connected")
+    console.log("Socket connection");
 
     socket.on("message", message => {
         const { action, data } = JSON.parse(message.toString());

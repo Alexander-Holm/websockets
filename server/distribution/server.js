@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
 const enums_1 = require("./enums");
-const server = new ws_1.WebSocketServer({ port: 5050 });
-console.log("server started");
+const server = new ws_1.WebSocketServer({ port: 443 });
+console.log("Server started");
 class User {
     constructor(name, socket) {
         this.name = name;
@@ -12,7 +12,7 @@ class User {
 }
 const connectedUsers = [];
 server.on("connection", socket => {
-    console.log("client connected");
+    console.log("Socket connection");
     socket.on("message", message => {
         const { action, data } = JSON.parse(message.toString());
         //#region Error-handling

@@ -1,14 +1,16 @@
 <script lang="ts">
     import Chat from './components/Chat.svelte';
     import NameSelector from './components/NameSelector.svelte';
+    // Vet inte varför det inte går att importera från server/source/enums.ts
     import { Actions } from "../../server/distribution/enums";
 
-
+    
+    const SERVICE_URL = process.env.SERVICE_URL;
     let isConnected = false;
     let websocket: WebSocket;
 
     function nameSelectionHandler(name: string){
-        websocket = new WebSocket("ws://localhost:5050");        
+        websocket = new WebSocket(SERVICE_URL);
         websocket.onopen = (e) => {
             const data = { action: Actions.Connect, data: name};
             const json = JSON.stringify(data);

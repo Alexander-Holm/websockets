@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -39,8 +41,14 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
-		svelte({
-			preprocess: sveltePreprocess({ sourceMap: !production }),
+        svelte({
+            preprocess: sveltePreprocess({ 
+                sourceMap: !production,
+                // Ett sätt att använda environment variables
+                // https://github.com/sveltejs/svelte-preprocess#replace-values
+                // https://sam.elborai.me/articles/svelte-env-file/
+                replace: [[ "process.env.SERVICE_URL", JSON.stringify(process.env.SERVICE_URL) ]],
+            }),
 			compilerOptions: {
 				// enable run-time checks when not in production
 				dev: !production
