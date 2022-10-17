@@ -1,6 +1,14 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
+    "extends": "@tsconfig/svelte/tsconfig.json",
 
-  "include": ["src/**/*"],
-  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+    //  Måste lägga include till server i rollup.config.js också
+    "include": ["src/**/*", "../server/source/**/*"],
+    "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
+
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@server/*": ["../../server/source/*"]
+        }
+    }
 }

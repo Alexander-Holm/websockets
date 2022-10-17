@@ -70,7 +70,11 @@ export default {
 		commonjs(),
 		typescript({
 			sourceMap: !production,
-			inlineSources: !production
+			inlineSources: !production,
+            // include till server måste ligga BÅDE här och i tsconfig
+            include: [                
+                "../server/source/**/*"
+            ]
 		}),
 
 		// In dev mode, call `npm run start` once

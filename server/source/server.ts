@@ -1,13 +1,15 @@
 import { WebSocketServer, WebSocket } from "ws"
-import { Actions, MessageTypes } from "./enums"
+import { Actions } from "./actions";
+import { Relay } from "./relays"
+
 
 const server = new WebSocketServer( { port: 5000 } );
 console.log("Server started");
 
 class User{
-    name: string;
+    name?: string;
     socket: WebSocket;
-    constructor(name: string, socket: WebSocket){
+    constructor(socket: WebSocket, name?: string, ){
         this.name = name;
         this.socket = socket;
     }
@@ -16,70 +18,47 @@ const connectedUsers: User[] = [];
 
 server.on("connection", socket => {
     console.log("Socket connection");
+    const user = new User(socket);
 
     socket.on("message", message => {
         const { action, data } = JSON.parse(message.toString());
 
-        //#region Error-handling
-        const createError = (message:string) => JSON.stringify( { type: MessageTypes.Error, data: message } );
-        if(
-            !isUserConnected(socket) &&
-            action !== Actions.Connect
-        ){
-            const errorMsg = `You must first use the action: ${Actions.Connect}, before using any other action`;
-            const error = createError(errorMsg);
-            socket.send(error);
-            return;
-        }
-        if(
-            isUserConnected(socket) &&
-            action === Actions.Connect
-        ){
-            const errorMsg = `User is already connected. If you want to change username use the action: ${Actions.ChangeUsername}`;
-            const error = createError(errorMsg);
-            socket.send(error);
-            return;
-        }
-        //#endregion
+        const error = handleErrors(user, action);
+        if(error) return;
 
         switch(action){
-            case Actions.Connect: 
-                let name = createUniqueName(data);
-                const user = new User(name, socket);
+            case Actions.Connect:             
+                user.name = createUniqueName(data);
                 connectedUsers.push(user);
-                broadcast(MessageTypes.UserConnected, user.name);
+                broadcast(Relay.UserConnected(user.name));
                 break;
 
             case Actions.ChatMessage:
-                broadcast(MessageTypes.ChatMessage, data); 
+                broadcast(Relay.ChatMessage(data, user.name as string)); 
                 break;
-
-            case Actions.ChangeUsername:
-                break;
-
         }        
     })
 
     socket.on("close", e => {
-        const index = connectedUsers.findIndex(user => user.socket === socket);
+        const index = connectedUsers.findIndex(item => item === user);
         if(index < 0)
             return;
-        const user = connectedUsers.splice(index, 1);
-        broadcast(MessageTypes.UserDisconnected, user[0].name);
+        connectedUsers.splice(index, 1);
+        broadcast(Relay.UserDisconnected(user.name as string));
     })
 
 })
 
-function broadcast(type:MessageTypes, data:any){
-    const json = JSON.stringify( {type, data} );
+// send to all
+function broadcast(json:string){
     connectedUsers.forEach(user => {
         user.socket.send(json);
     })
 }
 
-function isUserConnected(socket:WebSocket): boolean {
-    for(const user of connectedUsers){
-        if(user.socket == socket)
+function isUserConnected(user:User): boolean{
+    for(const item of connectedUsers){
+        if(item === user)
             return true;
     }
     return false;
@@ -93,4 +72,29 @@ function createUniqueName(name:string, iteration:number = 1): string {
         }
     })
     return name;
+}
+
+// Returnerar true om det finns ett error
+function handleErrors(user:User, action:Actions): boolean{
+    let error = false;
+    if(
+        !isUserConnected(user) &&
+        action !== Actions.Connect
+    ){
+        const errorMsg = `You must first use the action: ${Actions.Connect}, before using any other action`;
+        // const error = createError(errorMsg);
+        user.socket.send(Relay.Error(errorMsg));
+        error = true;
+    }
+    if(
+        isUserConnected(user) &&
+        action === Actions.Connect
+    ){
+        const errorMsg = `User is already connected`;
+        // const error = createError(errorMsg);
+        user.socket.send(Relay.Error(errorMsg));
+        error = true;
+    }
+
+    return error;
 }

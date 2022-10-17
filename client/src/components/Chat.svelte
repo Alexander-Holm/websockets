@@ -1,34 +1,33 @@
 <script lang="ts">
     import ChatMessage from "./ChatMessage.svelte";
-    import { Actions, MessageTypes } from "../../../server/distribution/enums";
-
+    import { Action } from "@server/actions";
+    import { IChatMessage, Relays } from "@server/relays";
+    
     export let socket: WebSocket;
 
-    let chatMessages = [];
+    let chatMessages: IChatMessage[] = [];
     let chatInput = "";
 
     socket.onmessage = message => {
-        const { type, data } = JSON.parse(message.data);
+        const { type, data } = JSON.parse(message.data as string);
         switch(type){
-            case MessageTypes.ChatMessage: 
-                // Kan inte använda array.push(), Svelte känner inte av ändringar av .push()
-                chatMessages = [...chatMessages, data];
+            case Relays.ChatMessage: 
+                // Kan inte använda array.push(), Svelte känner inte av ändringar av .push()                
+                chatMessages = [...chatMessages, data as IChatMessage];
                 break;
         }
     }
 
     function sendMessage(){
-        const data = { action: Actions.ChatMessage, data: chatInput};
-        const json = JSON.stringify(data);
-        socket.send(json);
+        socket.send(Action.ChatMessage(chatInput));
         chatInput = "";
     }
 </script>
 
 <section id="chat-container">
     <div id="chat-messages">
-        {#each chatMessages as message}
-            <ChatMessage user="TestUser" message={message} />
+        {#each chatMessages as item}
+            <ChatMessage user={item.username} message={item.message} />
         {/each }
     </div>
     <form id="chat-input" on:submit|preventDefault={sendMessage}>
