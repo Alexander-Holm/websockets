@@ -2,8 +2,6 @@
     import Chat from './components/Chat.svelte';
     import NameSelector from './components/NameSelector.svelte';
     import { Action } from "@server/actions"
-
-
     
     const SERVICE_URL = process.env.SERVICE_URL;
     let isConnected = false;

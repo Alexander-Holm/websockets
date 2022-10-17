@@ -20,6 +20,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        height: 100%;
     }
     label{
         font-size: 1.6rem;
@@ -37,23 +39,24 @@
     button{
         font-size: 1.2rem;
         padding: 0.6em 1em;
-        background-color: #46a506;
+        background-color: #549b25;
         color: white;
-        border: 2px solid #226a0d;
+        border: 1px solid #226a0d;
         border-radius: 4px;
         transition: 
-            /* hover */
-            100ms background-color, 100ms border-color    
             /* invalid */
-            500ms filter,
+            500ms background-color,
+            500ms border-color,
+            /* hover */
+            100ms filter
         ;
     }
         input:invalid + button{
-            filter: grayscale(0.8) brightness(1.2);
+            background-color: #999;
+            border-color: #757575;
         }
         input:valid + button:hover{
-            background-color: #3e9b00;
-            border-color: #004f00;
+            filter: brightness(1.1);
         }
 
 </style>
