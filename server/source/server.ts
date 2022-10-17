@@ -67,7 +67,7 @@ function isUserConnected(user:User): boolean{
 function createUniqueName(name:string, iteration:number = 1): string {
     connectedUsers.forEach(user => {
         if(user.name === name){
-            name += ` (${iteration})`;
+            name += ` (${iteration + 1})`;
             name = createUniqueName(name, iteration++);
         }
     })
