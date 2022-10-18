@@ -3,22 +3,16 @@ import { Actions } from "./actions";
 import { Relay } from "./relays"
 
 
-const server = new WebSocketServer( { port: 5000 } );
-console.log("Server started");
+interface IUser{ name?:string, socket:WebSocket}
+const connectedUsers: IUser[] = []
 
-class User{
-    name?: string;
-    socket: WebSocket;
-    constructor(socket: WebSocket, name?: string, ){
-        this.name = name;
-        this.socket = socket;
-    }
-}
-const connectedUsers: User[] = [];
+const server = new WebSocketServer( { port: 5000 } );
+server.on("listening", () => {console.log("Server listening")} );
+server.on("error", (e) => console.log("Server error!", e));
 
 server.on("connection", socket => {
     console.log("Socket connection");
-    const user = new User(socket);
+    const user: IUser = { socket };
 
     socket.on("message", message => {
         const { action, data } = JSON.parse(message.toString());
@@ -34,17 +28,22 @@ server.on("connection", socket => {
                 break;
 
             case Actions.ChatMessage:
-                broadcast(Relay.ChatMessage(data, user.name as string)); 
+                broadcast(Relay.ChatMessage(data, user.name!)); 
                 break;
+
+            case Actions.GetConnectedUsers:
+                const usernames = connectedUsers.map(user => user.name!);
+                socket.send(Relay.UserList(usernames));
         }        
     })
+
 
     socket.on("close", e => {
         const index = connectedUsers.findIndex(item => item === user);
         if(index < 0)
             return;
         connectedUsers.splice(index, 1);
-        broadcast(Relay.UserDisconnected(user.name as string));
+        broadcast(Relay.UserDisconnected(user.name!));
     })
 
 })
@@ -56,7 +55,7 @@ function broadcast(json:string){
     })
 }
 
-function isUserConnected(user:User): boolean{
+function isUserConnected(user:IUser): boolean{
     for(const item of connectedUsers){
         if(item === user)
             return true;
@@ -75,7 +74,7 @@ function createUniqueName(name:string, iteration:number = 1): string {
 }
 
 // Returnerar true om det finns ett error
-function handleErrors(user:User, action:Actions): boolean{
+function handleErrors(user:IUser, action:Actions): boolean{
     let error = false;
     if(
         !isUserConnected(user) &&

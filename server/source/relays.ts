@@ -3,6 +3,8 @@ export enum Relays{
     ChatMessage = "chat-message",
     UserConnected = "user-connected",
     UserDisconnected = "user-disconnected",
+    UserList = "user-list",
+
     Error = "error",
 }
 
@@ -21,6 +23,11 @@ export const Relay = {
         const payload = { type: Relays.UserDisconnected, data: username };
         return JSON.stringify(payload);
     },
+    UserList(usernames:string[]){
+        const payload = { type: Relays.UserList, data: usernames };
+        return JSON.stringify(payload);
+    },
+
     Error: (message:string) => {
         const payload = { type: Relays.Error, data: message };
         return JSON.stringify(payload);

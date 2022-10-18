@@ -3,18 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
 const actions_1 = require("./actions");
 const relays_1 = require("./relays");
-const server = new ws_1.WebSocketServer({ port: 5000 });
-console.log("Server started");
-class User {
-    constructor(socket, name) {
-        this.name = name;
-        this.socket = socket;
-    }
-}
 const connectedUsers = [];
+const server = new ws_1.WebSocketServer({ port: 5000 });
+server.on("listening", () => { console.log("Server listening"); });
+server.on("error", (e) => console.log("Server error!", e));
 server.on("connection", socket => {
     console.log("Socket connection");
-    const user = new User(socket);
+    const user = { socket };
     socket.on("message", message => {
         const { action, data } = JSON.parse(message.toString());
         const error = handleErrors(user, action);
@@ -29,6 +24,9 @@ server.on("connection", socket => {
             case actions_1.Actions.ChatMessage:
                 broadcast(relays_1.Relay.ChatMessage(data, user.name));
                 break;
+            case actions_1.Actions.GetConnectedUsers:
+                const usernames = connectedUsers.map(user => user.name);
+                socket.send(relays_1.Relay.UserList(usernames));
         }
     });
     socket.on("close", e => {
