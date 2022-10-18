@@ -8,7 +8,7 @@
     }
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form id="name-selector" on:submit|preventDefault={handleSubmit}>
     <label for="name" >Enter name</label>
     <input id="name" name="name" type="text" required />
 
@@ -16,7 +16,7 @@
 </form>
 
 <style>
-    form{
+    #name-selector{
         display: flex;
         flex-direction: column;
         align-items: center;
