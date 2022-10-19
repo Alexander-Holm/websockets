@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws"
 import { Actions } from "./actions";
 import { Relay } from "./relays"
+import type { ICanvasMessage } from "./types";
 
 
 interface IUser{ name?:string, socket:WebSocket}
@@ -21,19 +22,27 @@ server.on("connection", socket => {
         if(error) return;
 
         switch(action){
-            case Actions.Connect:             
+            case Actions.Connect:
                 user.name = createUniqueName(data);
                 connectedUsers.push(user);
+                socket.send(Relay.OnConnect(user.name));
                 broadcast(Relay.UserConnected(user.name));
                 break;
 
             case Actions.ChatMessage:
-                broadcast(Relay.ChatMessage(data, user.name!)); 
+                broadcast(Relay.ChatMessage( { message: data, username: user.name! } )); 
                 break;
 
             case Actions.GetConnectedUsers:
                 const usernames = connectedUsers.map(user => user.name!);
                 socket.send(Relay.UserList(usernames));
+                break;
+
+            case Actions.CanvasMessage:
+                const canvasMessage = data as ICanvasMessage;
+                canvasMessage.username = user.name;
+                broadcast(Relay.CanvasMessage(canvasMessage));
+                break;
         }        
     })
 

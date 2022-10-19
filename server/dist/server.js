@@ -19,14 +19,21 @@ server.on("connection", socket => {
             case actions_1.Actions.Connect:
                 user.name = createUniqueName(data);
                 connectedUsers.push(user);
+                socket.send(relays_1.Relay.OnConnect(user.name));
                 broadcast(relays_1.Relay.UserConnected(user.name));
                 break;
             case actions_1.Actions.ChatMessage:
-                broadcast(relays_1.Relay.ChatMessage(data, user.name));
+                broadcast(relays_1.Relay.ChatMessage({ message: data, username: user.name }));
                 break;
             case actions_1.Actions.GetConnectedUsers:
                 const usernames = connectedUsers.map(user => user.name);
                 socket.send(relays_1.Relay.UserList(usernames));
+                break;
+            case actions_1.Actions.CanvasMessage:
+                const canvasMessage = data;
+                canvasMessage.username = user.name;
+                broadcast(relays_1.Relay.CanvasMessage(canvasMessage));
+                break;
         }
     });
     socket.on("close", e => {

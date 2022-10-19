@@ -1,22 +1,28 @@
-// string enums för att lättare läsa och debugga websocket-anropen
+import type { ICanvasMessage } from "./types";
+
 export enum Actions {
     Connect = "connect",
     ChatMessage = "chat-message",
-    GetConnectedUsers= "get-connected-users",
+    GetConnectedUsers = "get-connected-users",
+    CanvasMessage = "canvas-message",
 } 
 
 // Kommunikation till servern
 export const Action = {
-    Connect: (username:string) => {
+    Connect(username:string) {
         const payload = { action: Actions.Connect, data: username };
         return JSON.stringify(payload);
     },
-    ChatMessage: (message:string) => {
+    ChatMessage(message:string) {
         const payload = { action: Actions.ChatMessage, data: message };
         return JSON.stringify(payload);
     },
-    GetConnectedUsers: () => {
+    GetConnectedUsers() {
         const payload = { action: Actions.GetConnectedUsers};
+        return JSON.stringify(payload);
+    },
+    CanvasMessage(canvasMessage: ICanvasMessage) {
+        const payload = { action: Actions.CanvasMessage, data: canvasMessage };
         return JSON.stringify(payload);
     }
 }
