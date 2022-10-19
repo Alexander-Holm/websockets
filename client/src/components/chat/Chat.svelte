@@ -3,11 +3,12 @@
     import { Action } from "@server/actions";
     import { Relays } from "@server/relays";
     import type { IChatMessage } from "@server/types";
-    import UserList from "./UserList.svelte";
+    import { UserList } from "./icons";
     
     export let socket: WebSocket;
     export let name: string;
     
+    let userlistToggled = false;
     let chatMessages: IChatMessage[] = [];
     let chatInput = "";
     // Svelte känner inte av när en array ändras av funktioner som push() och splice().
@@ -15,8 +16,8 @@
     // t.ex. array = [...array, newItem] eller array = array.filter()
     let users: string[] = [];
 
-    socket.onmessage = message => {
-        const { type, data } = JSON.parse(message.data as string);
+    socket.addEventListener("message", message => {
+        const { type, data } = JSON.parse(message.data);
         switch(type){
             case Relays.ChatMessage: 
                 chatMessages = [...chatMessages, data as IChatMessage];
@@ -26,7 +27,7 @@
             case Relays.UserConnected: users = [...users, data]; break;
             case Relays.UserDisconnected: users = users.filter(user => user !== data); break;
         }
-    }
+    })
 
     socket.send(Action.GetConnectedUsers());
 
@@ -38,16 +39,33 @@
 
 <section id="chat" class="grid">
 
-    <div class="message-container">
+    <div class="content-container">
         <div class="header">
-            <h2>{name}</h2>
-            <UserList usernames={users} />
+            <h2>{userlistToggled ? "Connected users" : name}</h2>
+            <button id="toggle-userlist" class:active={userlistToggled} on:click={() => userlistToggled = !userlistToggled}>{@html UserList}</button>
+            <!-- <UserList usernames={users} /> -->
         </div>
-        <div class="chat-messages">
+
+        {#if userlistToggled === false}
+        <div id="chat-messages" class="content">
             {#each chatMessages as item}
                 <ChatMessage user={item.username} message={item.message} />
             {/each }
-        </div>
+        </div>            
+        {/if}
+
+        {#if userlistToggled}
+        <div id="connected-users" class="content">
+            {#each users as user}
+                <span class="username" >
+                    {#if user === name}
+                    <strong>(You) </strong>
+                    {/if}
+                    {user}
+                </span>
+            {/each}
+        </div>            
+        {/if}
     </div>
 
     <form class="chat-input" on:submit|preventDefault={sendMessage}>
@@ -67,22 +85,66 @@
         height: 100%;
         flex-basis: 15rem;
     }
-    .message-container{
+    .content-container{
+        /* Måste ha flex eller height för att få scrollbar att fungera */
+        display: flex;
+        flex-direction: column;
         /* overflow:hidden för att få scrollbar på chatten som har overflow:auto */
-        overflow: hidden;
-
-        padding: 1rem;        
+        overflow: hidden;   
         border: 1px solid gray;
         border-radius: var(--border-radius);
     }
-    .header{
-        position: relative;
+
+    .header{        
+        display: flex;
+        gap: 1rem;
+        color: black;
+        background-image: linear-gradient(180deg, #dbd9d9, #f0f0f0);
+        box-shadow: 0 0 6px black;
+        padding-inline: 1rem;
+        padding-block: 0.5rem;
+    }
+    h2{
+        font-size: 1.3rem;
         text-align: center;
+        margin: auto;
+        margin-top: 0.7rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .chat-messages{
+        h2:hover{
+            overflow: visible;
+            overflow-wrap: anywhere;
+        }
+    #toggle-userlist{
+        height: 3rem;
+        aspect-ratio: 1;
+        display: flex;
+        border: 0;
+        border-radius: var(--border-radius);
+        background: transparent;    
+    }
+        #toggle-userlist:hover{
+            background-color: lightgray;
+        }
+        #toggle-userlist.active{
+            box-shadow: 0 0 2px black inset;
+        }
+
+
+    .content{        
         overflow-y: auto;
-        scrollbar-width: thin;        
+        scrollbar-width: thin;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
     }
+    #connected-users .username{
+        overflow-wrap: anywhere;
+        padding-block: 0.5rem;
+    } 
+
+
     .chat-input{
         display: flex;
         gap: 3px;
