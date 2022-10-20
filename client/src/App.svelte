@@ -62,9 +62,4 @@
         /* padding för att inte gömma outlines med overflow:hidden */
         padding: 10px;
     }
-    :global(.grid){
-        display: grid;
-        grid-template-rows: 1fr 5rem;
-        gap: 1rem;
-    }
 </style>

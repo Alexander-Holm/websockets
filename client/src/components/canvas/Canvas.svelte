@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import CanvasSettings from "./CanvasSettings.svelte";
+    import CanvasSettings from "./EmojiButtons.svelte";
     import { No, Write, Yes } from "./emojis"
     import { Emojis } from "@server/enums"
     import { Action } from "@server/actions";
@@ -112,8 +112,10 @@
     /* .grid från global */
     
     #canvas{
-        flex-grow: 1;
+        flex: 1;
         height: 100%;
+        width: 100%;
+        max-width: 1000px;
     }
     canvas{
         height: 100%;
