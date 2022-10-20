@@ -15,7 +15,10 @@
     <h2 in:fade|local >{username}</h2>
     {/if}
 
-    <button id="toggle-userlist" class:active={userlistToggled} on:click={() => userlistToggled = !userlistToggled}>        
+    <button id="toggle-userlist" class:active={userlistToggled} 
+        on:click={() => userlistToggled = !userlistToggled}
+        title={userlistToggled ? "Chat" : "Connected users"}
+    >        
         {#if userlistToggled}
         <span class="icon" transition:fly|local={{ y:-100, opacity:0 }} >{@html Message}</span>
         {:else}
