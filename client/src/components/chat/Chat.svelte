@@ -3,7 +3,8 @@
     import { Action } from "@server/actions";
     import { Relays } from "@server/relays";
     import type { IChatMessage } from "@server/types";
-    import { UserList } from "./icons";
+    import { fade } from "svelte/transition";
+    import Header from "./Header.svelte";
     
     export let socket: WebSocket;
     export let name: string;
@@ -34,20 +35,18 @@
     function sendMessage(){
         socket.send(Action.ChatMessage(chatInput));
         chatInput = "";
+        userlistToggled = false;
     }
+
 </script>
 
 <section id="chat" class="grid">
 
     <div class="content-container">
-        <div class="header">
-            <h2>{userlistToggled ? "Connected users" : name}</h2>
-            <button id="toggle-userlist" class:active={userlistToggled} on:click={() => userlistToggled = !userlistToggled}>{@html UserList}</button>
-            <!-- <UserList usernames={users} /> -->
-        </div>
+        <Header bind:userlistToggled={userlistToggled} username={name} />
 
         {#if userlistToggled === false}
-        <div id="chat-messages" class="content">
+        <div id="chat-messages" class="content" in:fade|local>
             {#each chatMessages as item}
                 <ChatMessage user={item.username} message={item.message} />
             {/each }
@@ -55,7 +54,7 @@
         {/if}
 
         {#if userlistToggled}
-        <div id="connected-users" class="content">
+        <div id="connected-users" class="content" in:fade|local>
             {#each users as user}
                 <span class="username" >
                     {#if user === name}
@@ -85,6 +84,7 @@
         height: 100%;
         flex-basis: 15rem;
     }
+
     .content-container{
         /* Måste ha flex eller height för att få scrollbar att fungera */
         display: flex;
@@ -94,44 +94,6 @@
         border: 1px solid gray;
         border-radius: var(--border-radius);
     }
-
-    .header{        
-        display: flex;
-        gap: 1rem;
-        color: black;
-        background-image: linear-gradient(180deg, #dbd9d9, #f0f0f0);
-        box-shadow: 0 0 6px black;
-        padding-inline: 1rem;
-        padding-block: 0.5rem;
-    }
-    h2{
-        font-size: 1.3rem;
-        text-align: center;
-        margin: auto;
-        margin-top: 0.7rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-        h2:hover{
-            overflow: visible;
-            overflow-wrap: anywhere;
-        }
-    #toggle-userlist{
-        height: 3rem;
-        aspect-ratio: 1;
-        display: flex;
-        border: 0;
-        border-radius: var(--border-radius);
-        background: transparent;    
-    }
-        #toggle-userlist:hover{
-            background-color: lightgray;
-        }
-        #toggle-userlist.active{
-            box-shadow: 0 0 2px black inset;
-        }
-
-
     .content{        
         overflow-y: auto;
         scrollbar-width: thin;
