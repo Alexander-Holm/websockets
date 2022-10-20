@@ -124,8 +124,14 @@
     #submit-chat-message{
         padding: 6px 16px;
         border: 0;
-        background-color: rgb(57, 117, 227);
+        background-color: var(--blue);
         color: white;
         font-size: 1rem;        
     }
+        #submit-chat-message:hover {
+            filter: brightness(1.1);
+        }
+        #submit-chat-message:active {
+            box-shadow: 0 0 4px black inset;
+        }
 </style>
