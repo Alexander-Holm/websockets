@@ -73,10 +73,11 @@ export default {
 			inlineSources: !production,
             // include till server måste ligga BÅDE här och i tsconfig
             include: [                
-                "../server/source/**/*"
-            ]
+                "../server/source/**/*",
+                "./src/components/canvas/*"
+            ],
 		}),
-
+        console.log(typescript),
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
 		!production && serve(),

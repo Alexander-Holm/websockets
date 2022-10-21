@@ -5,76 +5,101 @@
     import { Emojis } from "@server/enums"
     import { Action } from "@server/actions";
     import { Relays } from "@server/relays"
+    import { CanvasElement } from "./CanvasElement";
 
     export let socket: WebSocket;
 
     let canvas: HTMLCanvasElement;
-    let canvasRect: DOMRect;
     let selectedIcon: Emojis | null = null;
     socket.addEventListener("message", receiveMessage);
 
-    class CanvasElement { 
-        text: string;
-        image: HTMLImageElement;
-        // x, y är procent i decimalform, 0 till 1
-        xPercent:number; yPercent:number;
-        constructor(text:string, image:HTMLImageElement, xPercent:number, yPercent:number){
-            this.text = text;
-            this.image = image;
-            this.xPercent = xPercent;
-            this.yPercent = yPercent;
-        }
+    // Lägger element i in[] och out[] för att köra transitions på det,
+    // när det läggs till eller tas bort från canvas
+    class CanvasElements { 
+        in: CanvasElement[] = [];
+        static: CanvasElement[] = [];
+        out: CanvasElement[] = [];
     }
-    let canvasElements: CanvasElement[] = [];
-    $: { drawCanvas(canvasElements) }
+    let canvasElements = new CanvasElements();
+    // Tid som ett element visas på canvas mellan transitions
+    const ELEMENT_TIMER = 5000;
 
+    // onMount för att canvas inte ska vara undefined.
     onMount(() => {
-        // Storleken på canvas sätts i procent av CSS.
-        // För att koordinaterna ska fungera måste man sätta storleken i js också.
-        // https://stackoverflow.com/questions/10214873/make-canvas-as-wide-and-as-high-as-parent
-        // Phrogz answered Apr 18, 2012 at 18:34 
+        /* 
+            Storleken på canvas sätts i procent av CSS.
+            Det ändrar inte den faktiska storleken på canvas utan sträcker bara ut den.
+            Måste därför med Javascript sätta storleken till det värde i px som CSS räknar ut.
+
+            https://stackoverflow.com/questions/10214873/make-canvas-as-wide-and-as-high-as-parent
+            Phrogz answered Apr 18, 2012 at 18:34 
+        */
         function resizeHandler() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            canvasRect = canvas.getBoundingClientRect();
-            drawCanvas(canvasElements);
+            drawCanvas();
         }
         window.addEventListener("resize", resizeHandler);
         resizeHandler();
     })
 
-    function drawCanvas(canvasElements:CanvasElement[]){
+    function drawCanvas(){
         if(canvas == null) return;
         
-        let ctx = canvas.getContext("2d");        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        requestAnimationFrame(() => {            
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        canvasElements.forEach(item => {
-            const x = canvasRect.width * item.xPercent;
-            const y = canvasRect.height * item.yPercent;
- 
-            // Icon
-            const iconSize = 70;
-            const halfSize = iconSize / 2;
-            const centeredX = x - halfSize;
-            const centeredY = y - halfSize;
-            ctx.drawImage(item.image, centeredX, centeredY, iconSize, iconSize);
+            canvasElements.in.forEach(item => {
+                item.opacity += 0.1;
+                if(item.opacity < 1){
+                    item.draw(ctx);
+                }
+                else{
+                    item.opacity = 1;
+                    // Transition in är klar
+                    // Flytta item från in till static
+                    const index = canvasElements.in.indexOf(item);
+                    canvasElements.in.splice(index, 1);
+                    canvasElements.static.push(item);
+                    // Efter timer börja transition out
+                    setTimeout(() => {
+                        const index = canvasElements.static.indexOf(item)
+                        canvasElements.static.splice(index, 1);
+                        canvasElements.out = [...canvasElements.out, item];
+                        drawCanvas();
+                    }, ELEMENT_TIMER);
+                }
+            })
+    
+            canvasElements.static.forEach(item => {
+                item.draw(ctx)
+            })
+    
+            canvasElements.out.forEach(item => {
+                item.opacity -= 0.1;
+                if(item.opacity > 0){
+                    item.draw(ctx);
+                }
+                else {
+                    canvasElements.out = canvasElements.out.filter(x => x !== item);
+                }            
+            })
+            
+            if(canvasElements.in.length > 0 || canvasElements.out.length > 0)
+                drawCanvas();
+        });
 
-            // Text
-            const fontSize = 22; //px
-            ctx.font = `${fontSize}px comic sans MS`;
-            ctx.fillStyle = "black"
-            ctx.textAlign = "center";
-            const offsetY = halfSize + fontSize;
-            ctx.fillText(item.text, x , y+offsetY);
-        })
     }
 
-    function sendMessage(event: MouseEvent){
-        if(selectedIcon == null) return;        
 
-        const clickX = event.x - canvasRect.x;
-        const clickY = event.y - canvasRect.y;
+    function sendMessage(event: MouseEvent){
+        if(selectedIcon == null) return;
+
+        const canvasRect = canvas.getBoundingClientRect();
+        // left och top är avstånd från canvas till kanten av fönstret
+        const clickX = event.x - canvasRect.left;
+        const clickY = event.y - canvasRect.top;
         const xPercent = clickX / canvasRect.width;
         const yPercent = clickY / canvasRect.height;
 
@@ -98,7 +123,8 @@
         img.src = "data:image/svg+xml," + encodeURIComponent(svg);
         img.onload = () => {
             const newItem = new CanvasElement(username, img, xPercent, yPercent);
-            canvasElements = [...canvasElements, newItem];
+            canvasElements.in = [...canvasElements.in, newItem];
+            drawCanvas()
         }
     }   
 </script>
