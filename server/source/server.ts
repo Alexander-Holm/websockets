@@ -27,6 +27,7 @@ server.on("connection", socket => {
                 connectedUsers.push(user);
                 socket.send(Relay.OnConnect(user.name));
                 broadcast(Relay.UserConnected(user.name));
+                console.log("User connected: " + user.name)
                 break;
 
             case Actions.ChatMessage:
@@ -48,11 +49,15 @@ server.on("connection", socket => {
 
 
     socket.on("close", e => {
+        // Om socket är ansluten utan användarnamn,
+        // dvs. har inte använt Actions.Connect och finns inte i connectedUsers[],
+        // behöver då inte meddela andra att socket stängs.
         const index = connectedUsers.findIndex(item => item === user);
-        if(index < 0)
-            return;
+        if(index < 0) return;
+        
         connectedUsers.splice(index, 1);
         broadcast(Relay.UserDisconnected(user.name!));
+        console.log("Socket close")
     })
 
 })
@@ -85,21 +90,23 @@ function createUniqueName(name:string, iteration:number = 1): string {
 // Returnerar true om det finns ett error
 function handleErrors(user:IUser, action:Actions): boolean{
     let error = false;
+
+    // Försöker använda andra Actions innan Actions.Connect
     if(
         !isUserConnected(user) &&
         action !== Actions.Connect
     ){
         const errorMsg = `You must first use the action: ${Actions.Connect}, before using any other action`;
-        // const error = createError(errorMsg);
         user.socket.send(Relay.Error(errorMsg));
         error = true;
     }
+
+    // Actions.Connect har redan använts
     if(
         isUserConnected(user) &&
         action === Actions.Connect
     ){
         const errorMsg = `User is already connected`;
-        // const error = createError(errorMsg);
         user.socket.send(Relay.Error(errorMsg));
         error = true;
     }
