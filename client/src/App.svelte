@@ -51,15 +51,5 @@
         align-items: center;
         justify-content: center;
         gap: 2rem;
-
-        /* 
-            För att canvas height sätts med javascript vid fönster-resize.
-            Annars blir canvas högre när man gör fönstret bredare
-            och man får till slut en scrollbar.
-         */
-        height: 100%;
-        overflow-y: hidden;
-        /* padding för att inte gömma outlines med overflow:hidden */
-        padding: 10px;
     }
 </style>

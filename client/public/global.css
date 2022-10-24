@@ -11,7 +11,17 @@ html, body{
 }
 body{
     display: grid;
-    grid-template-rows: auto 1fr min(10%, 5rem);
+    /* 
+        minmax(0, 1fr) istället för 1fr,
+        gör att raden fyller resten av platsen som finns, precis som 1fr,
+        men kan inte bli större på grund av sin content.
+
+        Viktigt annars kan canvas växa konstigt när fönstret ändrar storlek.
+        
+        https://stackoverflow.com/questions/52861086/why-does-minmax0-1fr-work-for-long-elements-while-1fr-doesnt
+        https://stackoverflow.com/questions/52785750/prevent-grid-area-from-expanding-causing-whole-page-to-scroll
+     */
+    grid-template-rows: auto minmax(0, 1fr) min(10%, 5rem);
     padding: 50px;
 }
 
