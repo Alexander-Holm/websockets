@@ -10,6 +10,9 @@
     let websocket: WebSocket;
     let name:string;
 
+    // TEMP
+    nameSelectionHandler("TesUser")
+
     function nameSelectionHandler(inputName: string){
         isConnected = null;
         websocket = new WebSocket(SERVICE_URL);
@@ -26,7 +29,7 @@
 </script>
 
 <header>
-    <h1>Websocket chat test</h1>
+    <h1>Websockets chat</h1>
 </header>
 <main>
     {#if isConnected === false}
@@ -44,12 +47,31 @@
 
 <style>
     header{
+        margin-bottom: 4rem;
+        margin-inline: auto;
+        
         text-align: center;
+        padding: 1rem 3rem;
+
+        border: 3px solid #d8fff9;
+        box-shadow: 0 0 8px #59e0ff, 0 0 8px #59e0ff inset;
+        border-radius: 10px;
+
+        width: fit-content;
     }
+    h1{
+        font-size: 3rem;
+        font-family: brush script mt;
+        color: #ffeef1;
+        text-shadow: 0 0 12px #ff9cbd;
+
+        margin: 0;
+    }
+
     main{
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 2rem;
+        gap: 4rem;
     }
 </style>

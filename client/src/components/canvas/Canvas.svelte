@@ -141,15 +141,24 @@
         flex: 1;
         height: 100%;
         width: 100%;
-        max-width: 1000px;
+        max-width: 800px;
     }
     canvas{
+        --outline-width: 4px;
+
         height: 100%;
         width: 100%;
         box-sizing: border-box;
 
-        background-color: #f4f4f4;
-        border: 2px solid #757575;
-        border-radius: 5px;
+        outline: var(--outline-width) dotted #d8fff9;
+        outline-offset: calc( (var(--outline-width) / 2)  *-1 );
+        box-shadow: 
+            0 0 calc(var(--outline-width) *2) #59e0ff, 
+            0 0 calc(var(--outline-width) *2) #59e0ff inset;
+
+        background: white;
+        /* Transparent padding (border-radius fungerar inte) */
+        background-clip: content-box;
+        padding: calc(var(--outline-width) *2);
     }
 </style>

@@ -10,6 +10,7 @@ html, body{
     box-sizing: border-box;
 }
 body{
+    background-color: #292b37;
     display: grid;
     /* 
         minmax(0, 1fr) istället för 1fr,
@@ -21,7 +22,7 @@ body{
         https://stackoverflow.com/questions/52861086/why-does-minmax0-1fr-work-for-long-elements-while-1fr-doesnt
         https://stackoverflow.com/questions/52785750/prevent-grid-area-from-expanding-causing-whole-page-to-scroll
      */
-    grid-template-rows: auto minmax(0, 1fr) min(10%, 5rem);
+    grid-template-rows: auto minmax(0, 1fr) 2rem;
     padding: 50px;
 }
 

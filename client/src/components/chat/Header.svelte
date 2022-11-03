@@ -3,28 +3,17 @@
     import { Arrow, Message, UserList } from "./icons";
 
 
-    export let userlistToggled = false;
-    export let username: string;
+    export let text: string;
+    export let icon: string; // string av SVG, "<svg> </svg>"
+    export let iconTooltip: string;
+    export let clickIcon: () => void;
 </script>
 
 <div class="chat-header">
+    <h2 in:fade|local>{text}</h2>
 
-    {#if userlistToggled}
-    <h2 in:fade|local >Connected users</h2>
-    {:else}
-    <h2 in:fade|local >{username}</h2>
-    {/if}
-
-    <button id="toggle-userlist" class:active={userlistToggled} 
-        on:click={() => userlistToggled = !userlistToggled}
-        title={userlistToggled ? "Chat" : "Connected users"}
-    >        
-        {#if userlistToggled}
-        <span class="icon" transition:fly|local={{ y:-100, opacity:0 }} >{@html Message}</span>
-        {:else}
-        <span class="icon" transition:fly|local={{ y:-100, opacity:0 }} >{@html UserList}</span>
-        {/if}
-
+    <button id="toggle-userlist" title={iconTooltip} on:click={clickIcon} >
+        <span class="icon" in:fly|local={{ y:-100, opacity:0 }} >{@html icon}</span>
         <span class="arrow">{@html Arrow}</span>                
     </button>
 
