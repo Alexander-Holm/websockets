@@ -2,6 +2,11 @@
     --blue: #3975e3;
 }
 
+@font-face {
+    font-family: Clip;
+    src: url("./fonts/clip.regular.ttf");
+}
+
 html, body{
     height: 100%;
     width: 100%;

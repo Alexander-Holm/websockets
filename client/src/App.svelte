@@ -47,21 +47,24 @@
 
 <style>
     header{
-        margin-bottom: 4rem;
+        margin-bottom: 5rem;
         margin-inline: auto;
         
         text-align: center;
         padding: 1rem 3rem;
 
         border: 3px solid #d8fff9;
-        box-shadow: 0 0 8px #59e0ff, 0 0 8px #59e0ff inset;
+        box-shadow: 
+            0 0 8px #59e0ff, 
+            0 0 8px #59e0ff inset;
         border-radius: 10px;
 
         width: fit-content;
     }
     h1{
         font-size: 3rem;
-        font-family: brush script mt;
+        /* font-family: brush script mt; */
+        font-family: Clip;
         color: #ffeef1;
         text-shadow: 0 0 12px #ff9cbd;
 
