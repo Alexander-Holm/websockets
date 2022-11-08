@@ -3,8 +3,12 @@
 }
 
 @font-face {
-    font-family: Clip;
+    font-family:"clip";
     src: url("./fonts/clip.regular.ttf");
+}
+@font-face{
+    font-family:"dash";
+    src: url("./fonts/dash.otf");
 }
 
 html, body{
@@ -16,7 +20,7 @@ html, body{
 }
 body{
     background-color: #292b37;
-    display: grid;
+    display: grid;    
     /* 
         minmax(0, 1fr) istället för 1fr,
         gör att raden fyller resten av platsen som finns, precis som 1fr,
@@ -26,13 +30,13 @@ body{
         
         https://stackoverflow.com/questions/52861086/why-does-minmax0-1fr-work-for-long-elements-while-1fr-doesnt
         https://stackoverflow.com/questions/52785750/prevent-grid-area-from-expanding-causing-whole-page-to-scroll
-     */
-    grid-template-rows: auto minmax(0, 1fr) 2rem;
+     */ 
+    grid-template-rows: auto minmax(0, 1fr);
     padding: 50px;
 }
 
 .grid{
-    display: grid;
-    grid-template-rows: 1fr 8rem;
-    gap: 1rem;
+    display: grid;       
+    grid-template-rows: minmax(0, 1fr) 10rem;
+    gap: 2rem;
 }

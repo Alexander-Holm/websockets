@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import CanvasSettings from "./EmojiButtons.svelte";
+    import EmojiButtons from "./EmojiButtons.svelte";
     import { No, Write, Yes } from "./emojis"
     import { Emojis } from "@server/enums"
     import { Action } from "@server/actions";
@@ -131,11 +131,11 @@
 
 <section id="canvas" class="grid">
     <canvas bind:this={canvas} on:click={sendMessage} />
-    <CanvasSettings bind:selected={selectedIcon} />
+    <EmojiButtons bind:selected={selectedIcon} />
 </section>
 
 <style>
-    /* .grid från global */
+    /* .grid från global */    
     
     #canvas{
         flex: 1;
@@ -144,21 +144,30 @@
         max-width: 800px;
     }
     canvas{
-        --outline-width: 4px;
-
         height: 100%;
         width: 100%;
+
+        background: 
+            linear-gradient(hsla(0, 0%, 100%, 0.9) 50%, hsla(0, 0%, 100%, 0.8) 50%),
+            linear-gradient(90deg, red, green, blue);
+        background-size: 
+            100% 5px, 
+            15px 110%;
+        animation: scroll 15s infinite linear;
+
+        border: 4px solid hsl(0, 0%, 20%);
+        border-radius: 5% / 50%;
+        box-shadow: 0 0 40px #d9f8ff;
         box-sizing: border-box;
 
-        outline: var(--outline-width) dotted #d8fff9;
-        outline-offset: calc( (var(--outline-width) / 2)  *-1 );
-        box-shadow: 
-            0 0 calc(var(--outline-width) *2) #59e0ff, 
-            0 0 calc(var(--outline-width) *2) #59e0ff inset;
-
-        background: white;
-        /* Transparent padding (border-radius fungerar inte) */
-        background-clip: content-box;
-        padding: calc(var(--outline-width) *2);
     }
+        @keyframes scroll{
+            from{ background-position-y: top; }
+            to{ background-position-y: bottom; }
+        }
+        @media(prefers-reduced-motion){
+            canvas{
+                background:white;
+            }
+        }
 </style>
