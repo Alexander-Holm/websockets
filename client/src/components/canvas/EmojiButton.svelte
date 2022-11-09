@@ -10,7 +10,10 @@
     onMount(() => {
         const keyframes = new KeyframeEffect(
             borderRef,
-            [ { rotate: `${borderRotation}deg` }, { rotate: `${borderRotation+360}deg` } ],
+            [ 
+                { rotate: `${borderRotation}deg` }, // from
+                { rotate: `${borderRotation+360}deg` } // to
+            ],
             { duration: 1000, iterations: 1 }
         )        
         animation = new Animation(keyframes);
