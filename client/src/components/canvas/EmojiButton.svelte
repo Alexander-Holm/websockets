@@ -1,40 +1,57 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     export let active = false;
+    export let borderRotation = 0;
 
     let borderRef: HTMLSpanElement;
-    const animation = {
-        active: false,
-        ending: false,
-    }
+    let animation: Animation;
+    
+    onMount(() => {
+        const keyframes = new KeyframeEffect(
+            borderRef,
+            [ { rotate: `${borderRotation}deg` }, { rotate: `${borderRotation+360}deg` } ],
+            { duration: 1000, iterations: 1 }
+        )        
+        animation = new Animation(keyframes);
+        // Väntar på animation.finished för att starta animationen,
+        // måste därför sätta den manuellt här för att kunna starta animationen första gången.
+        animation.finish();
+    })
 
-    function startAnimation(){
-        borderRef.onanimationiteration = null;
-        animation.active = true;
-        animation.ending = false;
+    async function animationStart(){
+        // Väntar på att animationen ska bli klar om den redan körs,
+        // det blir hackigt annars när man ändrar easing
+        await animation.finished;
+        // playbackRate ändras av animationEnd
+        animation.updatePlaybackRate(1);
+        animation.effect.updateTiming({easing: "ease-in"})
+        animation.onfinish = animationLoop;
+        animation.play();
     }
-    function completeAnimation(){
-        borderRef.onanimationiteration = () => {
-            console.log("hej")
-            animation.ending = true;
-            endAnimation();
-        }
+    function animationLoop(){
+        animation.effect.updateTiming({easing: "linear"});
+        animation.onfinish = animation.play;
+        animation.play();
     }
-    function endAnimation(){        
-        borderRef.onanimationend = () =>{
-            animation.active = false;
-            animation.ending = false;
-            borderRef.onanimationiteration = null;
-        }
+    async function animationEnd(){
+        // Kör klart nuvarande varv med snabbare fart
+        animation.updatePlaybackRate(1.5);
+        // Kör ett varv till med snabbare fart och easing-out
+        await animation.finished;
+        animation.effect.updateTiming({easing: "ease-out"});
+        animation.onfinish = null;
+        animation.play();        
     }
 </script>
 
 <button class="emoji-button" class:active on:click
-    on:mouseenter={startAnimation} on:mouseleave={completeAnimation}
+    on:mouseenter={animationStart} on:mouseleave={animationEnd}
 >
     <span class="content">
         <slot></slot>
     </span>
-    <span bind:this={borderRef} class="border" class:animated={animation.active} class:ending={animation.ending} />    
+    <span bind:this={borderRef} class="border" style={`rotate: ${borderRotation}deg`} />    
 </button>
 
 <style>
@@ -52,9 +69,7 @@
         overflow: hidden;
         background: transparent;
         /* padding = border-width */
-        padding: 4px;       
-        
-        transition: 200ms;
+        padding: 4px;
     }
         .emoji-button.active{
             box-shadow: 0 0 30px #ff5aff;
@@ -66,11 +81,6 @@
         align-items: center; justify-content: center;
         padding: 0.5em;
         box-sizing: border-box;
-    }
-
-    @keyframes rotate{
-        from{rotate: 0deg}
-        to{rotate: 360deg;}
     }
     .border{
         content: "";
@@ -85,13 +95,4 @@
             rgb(254, 216, 255) 80%
         );
     }
-        .border.animated{
-            animation: 1s rotate linear infinite;
-        }
-            
-            .border.animated.ending{
-                animation: 5s rotate ease-out;
-            }
-        
-
 </style>

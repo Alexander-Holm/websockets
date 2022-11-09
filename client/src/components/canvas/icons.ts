@@ -1,9 +1,21 @@
+import { Emojis } from "@server/enums"
+
+// export längst ner
+
+function createIconObject(){
+    const icons = {
+        [Emojis.Yes]: Yes,
+        [Emojis.No]: No,
+        [Emojis.Write]: Write,
+    }
+    return icons;
+}
+
 /*
     Alla svg måste ha width och height för att rita på canvas.
     https://stackoverflow.com/questions/28690643/firefox-error-rendering-an-svg-image-to-html5-canvas-with-drawimage
 */
-
-export const No = `
+const No = `
     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100" height="100"
         viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
         <style type="text/css">
@@ -70,7 +82,7 @@ export const No = `
     </svg>
 `
 
-export const Yes = `
+const Yes = `
     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100" height="100"
         viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
         <style type="text/css">
@@ -138,7 +150,7 @@ export const Yes = `
     </svg>    
 `
 
-export const Write = `
+const Write = `
     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100" height="100"
         viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
         <style type="text/css">
@@ -200,3 +212,5 @@ export const Write = `
         </g>
     </svg>
 `
+
+export const ICONS = createIconObject();

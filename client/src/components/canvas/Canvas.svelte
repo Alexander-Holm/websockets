@@ -1,13 +1,14 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import EmojiButtons from "./EmojiButtons.svelte";
-    import { No, Write, Yes } from "./emojis"
+    import { ICONS } from "./icons"
     import { Emojis } from "@server/enums"
     import { Action } from "@server/actions";
     import { Relays } from "@server/relays"
     import { CanvasElement } from "./CanvasElement";
 
     export let socket: WebSocket;
+    console.log(ICONS[Emojis.Yes])
 
     let canvas: HTMLCanvasElement;
     let selectedIcon: Emojis | null = null;
@@ -113,13 +114,8 @@
         
         const { emoji, xPercent, yPercent, username } = data
 
-        let svg:string; // string av SVG, "<svg> </svg"
-        switch(emoji as Emojis){
-            case Emojis.Yes: svg = Yes; break;
-            case Emojis.No: svg = No; break;
-            case Emojis.Write: svg = Write; break;
-        }
-        const img = new Image();
+        const svg = ICONS[emoji];
+        const img = new Image();        
         img.src = "data:image/svg+xml," + encodeURIComponent(svg);
         img.onload = () => {
             const newItem = new CanvasElement(username, img, xPercent, yPercent);
