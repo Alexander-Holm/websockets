@@ -62,13 +62,11 @@
         width: fit-content;
     }
     h1{
+        margin: 0;
         font-size: 3rem;
-        /* font-family: brush script mt; */
-        font-family: Clip;
+        font-family: clip;
         color: #ffeef1;
         text-shadow: 0 0 12px #ff9cbd;
-
-        margin: 0;
     }
 
     main{
