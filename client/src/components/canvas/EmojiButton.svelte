@@ -1,55 +1,78 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { sineIn, cubicOut } from "svelte/easing"
 
     export let active = false;
     export let borderRotation = 0;
 
     let borderRef: HTMLSpanElement;
     let animation: Animation;
+    // Används för att kunna avbryta en transition och påbörja en ny.
+    // t.ex: mouseLeave -> mouseEnter , innan mouseLeave transition är klar
+    let transitionId: number;
     
     onMount(() => {
+        // Skapa animationen för border
         const keyframes = new KeyframeEffect(
             borderRef,
             [ 
                 { rotate: `${borderRotation}deg` }, // from
                 { rotate: `${borderRotation+360}deg` } // to
             ],
-            { duration: 1000, iterations: 1 }
+            { duration: 10000, iterations: Infinity }
         )        
         animation = new Animation(keyframes);
-        // Väntar på animation.finished för att starta animationen,
-        // måste därför sätta den manuellt här för att kunna starta animationen första gången.
-        animation.finish();
+        animation.play();
     })
 
-    async function animationStart(){
-        // Väntar på att animationen ska bli klar om den redan körs,
-        // det blir hackigt annars när man ändrar easing
-        await animation.finished;
-        // playbackRate ändras av animationEnd
-        animation.updatePlaybackRate(1);
-        animation.effect.updateTiming({easing: "ease-in"})
-        animation.onfinish = animationLoop;
-        animation.play();
+    // from: animation.playbackRate
+    // för att byta mjukt mellan transitions
+    function increaseSpeed(){
+        transitionId = speedTransition({
+            from: animation.playbackRate,
+            to: 10,
+            duration: 50,
+            easing: sineIn
+        });
     }
-    function animationLoop(){
-        animation.effect.updateTiming({easing: "linear"});
-        animation.onfinish = animation.play;
-        animation.play();
+    function decreaseSpeed(){
+        transitionId = speedTransition({
+            from: animation.playbackRate,
+            to: 1,
+            duration: 1000,
+            easing: cubicOut
+        })
     }
-    async function animationEnd(){
-        // Kör klart nuvarande varv med snabbare fart
-        animation.updatePlaybackRate(1.5);
-        // Kör ett varv till med snabbare fart och easing-out
-        await animation.finished;
-        animation.effect.updateTiming({easing: "ease-out"});
-        animation.onfinish = null;
-        animation.play();        
+
+    type transitionConfig = {
+        from: number,
+        to: number,
+        duration: number, //ms
+        easing: (progress: number) => number,
     }
+    function speedTransition(transition: transitionConfig , startTime = Date.now()){        
+        requestAnimationFrame(() => {
+            if(transitionId !== startTime) return;
+
+            const elapsedTime = Date.now() - startTime;
+            // progress måste vara mellan 0 och 1
+            const progress = Math.min( elapsedTime / transition.duration, 1 );
+            const transitionSpan = transition.to - transition.from;
+            const easingModifier = transition.easing(progress);
+            const easedValue =  (transitionSpan * easingModifier) + transition.from;
+            animation.updatePlaybackRate(easedValue);
+
+            if(progress < 1)
+                speedTransition(transition, startTime);
+        })
+        // Returnerar startTime som ett unikt id.
+        return startTime;
+    }    
 </script>
 
 <button class="emoji-button" class:active on:click
-    on:mouseenter={animationStart} on:mouseleave={animationEnd}
+    on:mouseenter={increaseSpeed} on:mouseleave={decreaseSpeed}
+    on:focus={increaseSpeed} on:blur={decreaseSpeed}
 >
     <span class="content">
         <slot></slot>
