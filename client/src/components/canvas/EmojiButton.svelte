@@ -96,6 +96,8 @@
         background: transparent;
         /* padding = border-width */
         padding: 4px;
+
+        transition: 200ms;
     }
         .emoji-button.active{
             box-shadow: 0 0 30px #ff5aff;
