@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { ICONS } from "./icons"
-    import { Emojis } from "@server/enums"
+    import type { Emojis } from "@server/enums"
     import { Action } from "@server/actions";
     import { Relays } from "@server/relays"
     import { CanvasElement } from "./CanvasElement";
     import EmojiButton from "./EmojiButton.svelte";
+    import type { ICanvasMessage } from "@server/types";
 
     export let socket: WebSocket;
     socket.addEventListener("message", receiveMessage);
@@ -14,7 +15,6 @@
 
     let selectedEmoji: Emojis | null = null;
     function clickEmoji(clickedEmoji: string){
-        console.log(clickedEmoji in Emojis)
         if(clickedEmoji === selectedEmoji){
             selectedEmoji = null;
             return;
@@ -117,10 +117,10 @@
         selectedEmoji = null;
     }
     function receiveMessage(websocketMessage: MessageEvent<any>){
-        const { type, data} = JSON.parse(websocketMessage.data);
+        const { type, data } = JSON.parse(websocketMessage.data);
         if(type !== Relays.CanvasMessage) return;
         
-        const { emoji, xPercent, yPercent, username } = data;
+        const { emoji, xPercent, yPercent, username }:ICanvasMessage = data;
 
         const svg = ICONS[emoji];
         const img = new Image();        
@@ -133,10 +133,10 @@
     }   
 </script>
 
-<section id="canvas" class="grid">
+<section id="canvas">
     <canvas bind:this={canvas} on:click={sendMessage} />
     <div id="emoji-selection">
-        <h3>Send an emoji on the screen</h3>
+        <h2>Send an emoji on the screen</h2>
         <div class="buttons">
             {#each Object.entries(ICONS) as [key, value], index}
                 <EmojiButton 
@@ -152,17 +152,19 @@
 </section>
 
 <style>
-    /* .grid från global */    
-    
     #canvas{
-        flex: 1;
         height: 100%;
         width: 100%;
-        max-width: 800px;
+        flex-basis: 45rem;
+
+        display: flex;
+        flex-direction: column;
     }
+
     canvas{
-        height: 100%;
         width: 100%;
+        height: 100%;
+        min-height: 300px;
 
         background: 
             linear-gradient(hsla(0, 0%, 100%, 0.9) 50%, hsla(0, 0%, 100%, 0.8) 50%),
@@ -174,9 +176,8 @@
 
         border: 4px solid hsl(0, 0%, 20%);
         border-radius: 5% / 50%;
-        box-shadow: 0 0 40px #d9f8ff;
+        box-shadow: 0 0 30px #d9f8ff;
         box-sizing: border-box;
-
     }
         @keyframes scroll{
             from{ background-position-y: top; }
@@ -184,19 +185,21 @@
         }
         @media(prefers-reduced-motion){
             canvas{
-                background:white;
+                animation: none;
             }
         }
 
 
-    #emoji-selection{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }    
-    h3{
+
+    /* #emoji-selection */
+    h2{
+        margin: 0;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+
         font-size: 2.5rem;
         font-family: dash;
+        text-align: center;
 
         color: transparent;
         background: linear-gradient( rgb(131, 221, 249) 20%, rgb(135, 80, 255) 60%, #e852f4 60%, rgb(254, 216, 255) 80% );
