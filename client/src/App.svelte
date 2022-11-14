@@ -1,17 +1,15 @@
 <script lang="ts">
     import { Action } from "@server/actions"
-    import Chat from './components/chat/Chat.svelte';
-    import NameSelector from './components/NameSelector.svelte';
-    import Canvas from './components/canvas/Canvas.svelte';
     import { Relays } from "@server/relays";
+    import NameSelector from './components/NameSelector.svelte';
+    import Chat from './components/chat/Chat.svelte';
+    import Canvas from './components/canvas/Canvas.svelte';
+    import Header from "./components/Header.svelte";
     
     const SERVICE_URL = process.env.SERVICE_URL;
     let isConnected: boolean | null = false;
     let websocket: WebSocket;
     let name:string;
-
-    // TEMP
-    nameSelectionHandler("TesUser")
 
     function nameSelectionHandler(inputName: string){
         isConnected = null;
@@ -28,9 +26,7 @@
     }
 </script>
 
-<header>
-    <h1>Websockets chat</h1>
-</header>
+<Header />
 <main>
     {#if isConnected === false}
         <NameSelector onSubmit={nameSelectionHandler} />        
@@ -46,33 +42,10 @@
 </main>
 
 <style>
-    header{
-        margin-bottom: 5rem;
-        margin-inline: auto;
-        
-        text-align: center;
-        padding: 1rem 3rem;
-
-        border: 3px solid #d8fff9;
-        box-shadow: 
-            0 0 8px #59e0ff, 
-            0 0 8px #59e0ff inset;
-        border-radius: 10px;
-
-        width: fit-content;
-    }
-    h1{
-        margin: 0;
-        font-size: 3rem;
-        font-family: clip;
-        color: #ffeef1;
-        text-shadow: 0 0 12px #ff9cbd;
-    }
-
     main{
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4rem;
+        gap: 10%;
     }
 </style>
