@@ -11,6 +11,9 @@
     let websocket: WebSocket;
     let name:string;
 
+    // TEMP
+    nameSelectionHandler("TestUser")
+
     function nameSelectionHandler(inputName: string){
         isConnected = null;
         websocket = new WebSocket(SERVICE_URL);

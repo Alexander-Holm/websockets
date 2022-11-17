@@ -22,32 +22,34 @@
 <style>
     .chat-header{        
         display: flex;
-        align-items: start;
-        gap: 1rem;
-        color: black;
-        background-image: linear-gradient(180deg, #dbd9d9, #f0f0f0);
-        box-shadow: 0 0 6px black;
-        padding-block: 1rem;
-        padding-inline: 0.5rem;
+        justify-content: space-between;
+        gap: 10px;
     }
+
     h2{
         font-size: 1.3rem;
         text-align: center;
-        margin: auto;
-        margin-top: 0.2rem;
+        margin: 0;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        background-color: darkred;
     }
         h2:hover{
             overflow: visible;
             overflow-wrap: anywhere;
         }
+
     #toggle-userlist{
+        /* grid för svelte transitions */
         display: grid;
         grid-template-columns: 2rem 1.3rem;
         border: 0;
         border-radius: var(--border-radius);
-        background: transparent;    
+
+        background: purple;    
+        color: white;
+        border-right: 3px solid aqua;
     }
         #toggle-userlist:hover{
             background-color: lightgray;

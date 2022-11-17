@@ -6,6 +6,9 @@
     import { fade, fly, scale } from "svelte/transition";
     import Header from "./Header.svelte";
     import { Enter, Exit, Message, User, UserList } from "./icons";
+    import Content from "./Content.svelte";
+    import ButtonCyberpunk from "./ButtonCyberpunk.svelte";
+    import Tab from "./Tab.svelte";
     
     export let socket: WebSocket;
     export let name: string;
@@ -90,12 +93,11 @@
 
 </script>
 
-<section id="chat" class="grid">
+<section id="chat">
 
-    <div class="content-container">
+    <div class="content-box">
 
     
-
     {#if !userlistToggled}
         {#if connectionPopups.length > 0}
             <div class="popup" transition:scale|local >
@@ -107,13 +109,27 @@
             </div>
         {/if}
 
-        <Header text={name} icon={UserList} iconTooltip="Connected users" clickIcon={toggleView} />
+        
+            <div class="header">
+                <!-- <h2 class="label">Chat</h2> -->
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" stroke-linecap="square" >
+                    <path d="M 10 10 h 30 l 5 5 h 40 v 20 l -10 10 H 10 V 10" />
+                </svg> -->
+                <Tab title="Chat" />
+                <Tab title="Users" />
+            </div>
+            <div class="scroll-container">
+                {#each chatMessages as item}
+                    <ChatMessage user={item.username} message={item.message} />
+                {/each }
+            </div>
+            <!-- <Header text={"Chat"} icon={UserList} iconTooltip="Connected users" clickIcon={toggleView} /> -->
+            <!-- <Content>
+                {#each chatMessages as item}
+                    <ChatMessage user={item.username} message={item.message} />
+                {/each }
+            </Content> -->
 
-        <div id="chat-messages" class="content" in:fade|local>
-            {#each chatMessages as item}
-            <ChatMessage user={item.username} message={item.message} />
-            {/each }
-        </div>
 
     {/if}
 
@@ -133,8 +149,23 @@
             </span>
         </div>
         {/if}
+
+        <div class="header">
+            <h2 class="label">Users</h2>
+            <ButtonCyberpunk type="button" on:click={toggleView} >Chat</ButtonCyberpunk>
+        </div>
+        <div class="scroll-container">
+            {#each users as user}
+                <span class="username" >
+                    {#if user === name}
+                        <strong>(You) </strong>
+                    {/if}
+                    {user}
+                </span>
+            {/each}
+        </div>
     
-        <Header text="Connected users" icon={Message} iconTooltip="Chat" clickIcon={toggleView} />
+        <!-- <Header text="Connected users" icon={Message} iconTooltip="Chat" clickIcon={toggleView} />
         
         <div id="connected-users" class="content" in:fade|local>
             {#each users as user}
@@ -145,46 +176,95 @@
                     {user}
                 </span>
             {/each}
-        </div>  
+        </div>   -->
     {/if}
 
     </div>
 
     <form class="chat-input" on:submit|preventDefault={sendMessage}>
         <input type="text" placeholder="..." bind:value={chatInput} required  />
-        <button id="submit-chat-message" type="submit" >Send</button>
+        <!-- <button id="submit-chat-message" type="submit" >Send</button> -->
+        <ButtonCyberpunk id="submit-chat-message" type="submit" >Send</ButtonCyberpunk>
     </form>
 
 </section>
 
 
 <style>
-    /* .grid från global */
-
     #chat{
         --border-radius: 4px;
 
+        font-family: 'Courier New', Courier, monospace;
+
         height: 100%;
-        flex-basis: 15rem;
+        flex-basis: 20rem;
 
-        position: relative;
-    }
-
-    .content-container{
-        /* Måste ha flex eller height för att få scrollbar att fungera */
         display: flex;
         flex-direction: column;
-        /* overflow:hidden för att få scrollbar på chatten som har overflow:auto */
-        overflow: hidden;   
-        border: 1px solid gray;
-        border-radius: var(--border-radius);
+
+        position: relative;
+
     }
+    .content-box{
+        /* 
+            min-height är auto som default och låter inte height vara lägre än height på children.
+
+            flex:1 tillsammans med min-height gör att elementet kan växa i flexbox,
+            men inte större än sin tilldelade storlek.
+
+            Det gör att overflow-y går att sätta på children för att få en scrollbar
+        */
+        min-height: 300px;
+        flex: 1;
+
+        background-color: #1d2733;
+        position: relative;
+        /* Flyttar in scrollbaren en bit */
+        padding: 16px;     
+        
+        border: 1px solid darkred;
+    }
+
+    .header{        
+        position: absolute;
+        bottom: 100%; left: 0;
+        width: 100%;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 10px;
+    }
+    .label{
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 0;
+
+        background-color: darkred;
+    }
+
+    .scroll-container{        
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+
+        padding-inline: 20px;
+        display: flex;
+        flex-direction: column;
+
+        height: 100%;
+        box-sizing: border-box;
+    }
+
     .content{        
         overflow-y: auto;
         scrollbar-width: thin;
         padding: 1rem;
         display: flex;
         flex-direction: column;
+
+        height: 100%;
+        box-sizing: border-box;
     }
     #connected-users .username{
         overflow-wrap: anywhere;
@@ -195,23 +275,23 @@
     .chat-input{
         display: flex;
         gap: 3px;
-
-        max-height: 3rem;
-        border: 1px solid gray;
-        border-radius: var(--border-radius);
+        padding: 6px;
+        border: none;
     }
     .chat-input input{
         flex-grow: 1;
         padding-inline: 1rem;
-        border: 0;
+        border: none;
         border-radius: inherit;
     }
     #submit-chat-message{
-        padding: 6px 16px;
-        border: 0;
-        background-color: var(--blue);
+        padding: 8px 14px;
+        border: none;
+        border-right: 3px solid aqua;
+        background-color: #ff2f6a;
         color: white;
-        font-size: 1rem;        
+        font-size: 1.1rem;      
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 15% 100%, 0 80%);  
     }
         #submit-chat-message:hover {
             filter: brightness(1.1);
