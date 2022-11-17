@@ -91,14 +91,48 @@
         userlistToggled = !userlistToggled;
     }
 
+    enum Tabs {
+        Chat,
+        Users
+    }
+    let currentTab = Tabs.Chat;
+    function changeTab(newTab: Tabs){
+        newMessages = 0;
+        connectionPopups = [];
+        currentTab = newTab;
+    }
+
 </script>
 
 <section id="chat">
 
     <div class="content-box">
 
+        <div class="header">
+            <Tab title="Chat" active={currentTab === Tabs.Chat} on:click={() => changeTab(Tabs.Chat)} />
+            <Tab title="Users" active={currentTab === Tabs.Users} on:click={() => changeTab(Tabs.Users)} />
+        </div>
+
+        <div class="scroll-container">            
+            {#if Tabs.Chat === currentTab}
+                {#each chatMessages as item}
+                    <ChatMessage user={item.username} message={item.message} />
+                {/each }                    
+            {/if}
+
+            {#if Tabs.Users === currentTab}
+                {#each users as user}
+                    <span class="username" >
+                        {#if user === name}
+                            <strong>(You) </strong>
+                        {/if}
+                        {user}
+                    </span>
+                {/each}
+            {/if}
+        </div>  
     
-    {#if !userlistToggled}
+    {#if userlistToggled}
         {#if connectionPopups.length > 0}
             <div class="popup" transition:scale|local >
                 <span class="text">
@@ -110,14 +144,7 @@
         {/if}
 
         
-            <div class="header">
-                <!-- <h2 class="label">Chat</h2> -->
-                <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" stroke-linecap="square" >
-                    <path d="M 10 10 h 30 l 5 5 h 40 v 20 l -10 10 H 10 V 10" />
-                </svg> -->
-                <Tab title="Chat" />
-                <Tab title="Users" />
-            </div>
+            
             <div class="scroll-container">
                 {#each chatMessages as item}
                     <ChatMessage user={item.username} message={item.message} />
@@ -217,23 +244,25 @@
         min-height: 300px;
         flex: 1;
 
-        background-color: #1d2733;
+        --background-color: #1d2733;
+        background-color: var(--background-color);
         position: relative;
         /* Flyttar in scrollbaren en bit */
         padding: 16px;     
         
-        border: 1px solid darkred;
+        --border-width: 2px;
+        --border-color: #8aff86;
+        border: var(--border-width) var(--border-color) solid;
+        filter: drop-shadow(0 0 1px #07df00);
     }
 
     .header{        
         position: absolute;
-        bottom: 100%; left: 0;
+        bottom: 100%; right: var(--border-width);
         width: 100%;
 
         display: flex;
-        justify-content: space-between;
-        align-items: end;
-        gap: 10px;
+        gap: 6px;
     }
     .label{
         font-size: 1.1rem;

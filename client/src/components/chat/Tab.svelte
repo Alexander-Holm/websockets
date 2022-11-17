@@ -3,32 +3,51 @@
     export let active = false;
 </script>
 
-<div class="tab" class:active={active}>
-    <h2>{title}</h2>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"
+<button class="tab" class:active={active} on:click>
+    <h2 class="tab-title">{title}</h2>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"
         stroke-linecap="square" vector-effect="non-scaling-stroke"
     >
-        <path d="m 10 10 h 30 l 3 3 H 90 v 19 l -7 8 H 10 V 10" />
+        <clipPath id="clip">
+            <use xlink:href="#tab-shape" />
+        </clipPath>
+        <path id="tab-shape" clip-path="url(#clip)" d="m 0 0 h 30 l 3 3 H 100 v 29 l -7 8 H 0 V 0" />
     </svg>
-</div>
+</button>
 
 <style>
     .tab{
         position: relative;
-        width: 7rem;
+        width: 6rem;
+        display: flex;
+
+        color: var(--border-color);
+
+        fill: darkslategray;
+        stroke: var(--border-color);
+        stroke-width: calc( var(--border-width) * 2 );
+
+        /* Ta bort button default style */
+        border: none; background: transparent;
+        padding: 0; margin: 0;
     }
-    h2{
+        .tab.active{
+            color: rgb(130, 255, 255);
+            text-shadow: 0 0 6px rgb(0, 255, 255);
+
+            fill: var(--background-color);
+        }
+        .tab:hover{
+            filter: brightness(1.2);
+        }
+
+    .tab-title{
         position: absolute;
-        top: 50%; left: 50%;
+        top: 55%; left: 50%;
         translate: -50% -50%;
 
-        color: white;
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin: 0;
     }
-    svg{
-        fill: crimson;
-        stroke: lightgoldenrodyellow;
-        stroke-width: 1px;
-    }
+
 </style>
